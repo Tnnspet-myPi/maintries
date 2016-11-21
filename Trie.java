@@ -128,7 +128,6 @@ public class Trie {
       {
         if (map.containsKey(companyName.get(i).get(j))) 
         {
-          System.out.println(companyName.get(i).get(j));
           total += map.get(companyName.get(i).get(j));
           searchMap.put(companyName.get(i).get(0), total);
         } 
