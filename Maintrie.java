@@ -2,6 +2,8 @@ package maintries;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -11,26 +13,27 @@ import java.util.Map.Entry;
 
 public class Maintrie {
 
-  public static void main(String[] args) throws FileNotFoundException {
+  public static void main(String[] args) throws IOException {
 
-    File inputFile = new File("infile.txt");
+    File inputFile = new File("infile.dat");
 
     File company = new File("companies.dat");
 
     System.out.println("Company\t\t\tHit Count\t\tRelevance");
 
+    @SuppressWarnings("unused")
     Maintrie s = new Maintrie(company, inputFile);
   }
 
   // Constructor for Maintrie
-  public Maintrie(File company, File inputfile) throws FileNotFoundException {
+  public Maintrie(File company, File inputfile) throws IOException {
 
-    ArrayList<String> article = processFile(inputfile);
+    String article = processFile(inputfile);
     ArrayList<ArrayList<String>> companyName = processCompanyName(company);
     Trie companyTire = new Trie();
     companyTire.insertCompanyNames(companyName);
     Map<String, Integer> map = companyTire.searchWords(article, companyName);
-    outputResult(map, article.size());
+    outputResult(map, processFileLength(inputfile));
 
   }
 
@@ -41,30 +44,12 @@ public class Maintrie {
   /* store each company's name into a arraylist but ignoring */
   /* "a,an,the,and,or,but"                                   */
   /* --------------------------------------------------------*/
-  public ArrayList<String> processFile(File inputFile) throws FileNotFoundException {
+  public String processFile(File inputFile) throws IOException {
 
-    ArrayList<String> inputList = new ArrayList<>();
-
-    Scanner scanner = new Scanner(inputFile);
-
+    String inputString = new String(Files.readAllBytes(inputFile.toPath()));
     
-    while (scanner.hasNextLine()) {
-
-      String sentence = scanner.nextLine();
-      String[] tokens = sentence.split("(\\, )|(\\ )|(\\'s )|(\" )|(\")|(\\. )|(\\/)");
-    
-      for (String word : tokens) {
-        if (!word.equals("a") && !word.equals("an") && !word.equals("the") && !word.equals("and") 
-                              && !word.equals("or") && !word.equals("but") && !word.equals("")) {
-          inputList.add(word);
-        }
-      }
-    }
-    
-    scanner.close();
-    
-    return inputList;
-    }
+    return inputString;
+  }
 
   /*---------------------------------------------------------*/
   /* Function Name: processCompanyName */
@@ -99,6 +84,31 @@ public class Maintrie {
      
     scanner.close();
     return companyList;
+  }
+  
+  public Integer processFileLength(File inputFile) throws FileNotFoundException
+  {
+    ArrayList<String> inputList = new ArrayList<>();
+
+    Scanner scanner = new Scanner(inputFile);
+
+    
+    while (scanner.hasNextLine()) {
+
+      String sentence = scanner.nextLine();
+      String[] tokens = sentence.split("(\\, )|(\\ )|(\\'s )|(\" )|(\")|(\\. )|(\\/)");
+    
+      for (String word : tokens) {
+        if (!word.equals("a") && !word.equals("an") && !word.equals("the") && !word.equals("and") 
+                              && !word.equals("or") && !word.equals("but") && !word.equals("")) {
+          inputList.add(word);
+        }
+      }
+    }
+    
+    scanner.close();
+    
+    return inputList.size();
   }
 
   /*---------------------------------------------------------*/

@@ -31,7 +31,8 @@ public class Trie {
   }
   
   /*---------------------------------------------------------*/
-  /* Function Name: insert                   */
+  /* Function Name: insert                  
+   *  */
   /*                                                         */
   /* Description: This is a private function serve         */
   /* insertCompanyNames function, it will build tire for     */
@@ -62,6 +63,7 @@ public class Trie {
       // if reach the end of word, mark it's leaf.
       if (i == word.length() - 1) {
         tn.isLeaf = true;
+        tn.fullName = word;
       }
     }
   }
@@ -79,7 +81,7 @@ public class Trie {
   /* --------------------------------------------------------*/
   
   
-  public Map<String, Integer> searchWords(ArrayList<String> words, ArrayList<ArrayList<String>> companyName) {
+  public Map<String, Integer> searchWords(String words, ArrayList<ArrayList<String>> companyName) {
 
     int freq = 0;
     int total = 0;
@@ -88,34 +90,54 @@ public class Trie {
     // map for storing primary company name and summed frequency
     Map<String, Integer> searchMap = new HashMap<>();
 
-    // iterate each word and compare with tire
-    for (String word : words) {
-      TrieNode result = search(word);
-      if (result != null && result.isLeaf == true) {
-        if (map.containsKey(word)) {
-          freq = map.get(word);
-          map.put(word, ++freq);
-        } else {
-          map.put(word, 1);
+    Map<Character, TrieNode> children = root.childern;
+    TrieNode tn = null;
+    String word;
+    
+    for (char ch : words.toCharArray())
+    {
+      if (children.containsKey(ch)) 
+      {
+        tn = children.get(ch);
+        children = tn.childern;
+        if(tn.isLeaf == true)
+        {
+          word = tn.fullName;
+          if(map.containsKey(word))
+          {
+           freq = map.get(word);
+           map.put(word, ++freq);
+          }
+          else
+          {
+            map.put(word, 1);
+          }
+          children = root.childern;
         }
-      } else {
-        continue;
+      } 
+      else 
+      {
+        children = root.childern;
       }
     }
 
     // sum up frequency of each companyName, and put
     // primary name and total frequency into searchMap
     for (int i = 0; i < companyName.size(); i++) {
-      for (int j = 0; j < companyName.get(i).size(); j++) {
-        if (map.containsKey(companyName.get(i).get(j))) {
+      for (int j = 0; j < companyName.get(i).size(); j++) 
+      {
+        if (map.containsKey(companyName.get(i).get(j))) 
+        {
+          System.out.println(companyName.get(i).get(j));
           total += map.get(companyName.get(i).get(j));
           searchMap.put(companyName.get(i).get(0), total);
-        }else{
+        } 
+        else
+        {
           continue;
         }
-        total=0;
       }
-
+      total=0;
     }
     // if total frequency of a company is 0, then add that company's
     // primary name and total frequency=0 into map.
@@ -128,31 +150,4 @@ public class Trie {
     return searchMap;
 
   }
-
-  /*---------------------------------------------------------*/
-  /* Function Name: search                     */
-  /*                                                         */
-  /* Description: This is a private function serve         */
-  /* searchWords function, it will return the last TireNode  */
-  /* of each word if it's matched                */
-  /* --------------------------------------------------------*/
-  
-  private TrieNode search(String word) {
-    Map<Character, TrieNode> children = root.childern;
-
-    TrieNode tn = null;
-
-    for (int i = 0; i < word.length(); i++) {
-      char ch = word.charAt(i);
-      if (children.containsKey(ch)) {
-        tn = children.get(ch);
-        children = tn.childern;
-      } else {
-        return null;
-      }
-    }
-    return tn;
-
-  }
-
 }

@@ -7,6 +7,8 @@ public class TrieNode {
 
   // character of tireNode
   char ch;
+  
+  String fullName;
 
   //Hashmap to store childern of a tireNode
   Map<Character, TrieNode> childern = new HashMap<Character, TrieNode>();
